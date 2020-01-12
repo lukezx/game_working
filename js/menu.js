@@ -31,16 +31,9 @@ class Menu extends Phaser.Scene{
         this.addButtonSelectCursor();
 
         this.sound.play("title_music", {
-            loop: true
+            loop: true,
+            volume: "0.5"
         });
-
-        
-
-        // this.input.keyboard.on('keyup_D', event => {
-        //     slimeSprite.x += 10;
-        // });
-        
-
     }
 
     addButtonSelectCursor()
@@ -101,8 +94,22 @@ class Menu extends Phaser.Scene{
             this.slimeSprite.setVisible(false);
         });
         this.options_btn.on("pointerup", () => {
-            this.scene.start("Options");
+            // this.scene.start("Options");
+            this.openOptionsMenu();
         });
+    }
+
+    openOptionsMenu()
+    {
+        this.scene.run("Options");
+        this.play_btn.setActive(false)
+        this.options_btn.setActive(false);
+    }
+
+    closeOptionsMenu()
+    {
+        this.play_btn.setActive(true);
+        this.options_btn.setActive(true);
     }
 
     addSoundToggle()

@@ -7,13 +7,14 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 } ,// Top down game, so no gravity
-            debug: true
+            debug: false
         }
     },
-    scene: [Load, Menu, Options, Game],
+    scene: [Load, Menu, Options, Game, Game_Over],
     render: {
         pixelArt: true
     }
 };
 
+let settings = new Global_Settings();
 let game = new Phaser.Game(config);

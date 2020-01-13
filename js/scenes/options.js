@@ -52,6 +52,8 @@ class Options extends Phaser.Scene{
             let rightX = this.vol_slider.x + this.vol_slider.width / 2;
             settings.vol =  this.map(event.x, leftX, rightX, 0, 100);
             this.vol_slider_fill.fillRect(leftX, this.vol_slider.y, 3*settings.vol, this.vol_slider.height-2);
+            this.sound.volume = settings.vol / 100;
+            console.log(this.sound.volume);
         });      
 
     }
@@ -98,7 +100,7 @@ class Options extends Phaser.Scene{
         this.backBtn.setInteractive();
         this.backBtn.on("pointerup", () => {
             this.scene.stop(this);
-        })
+        });
     }
     
     //Map value from between startRangeLower and startRangeHigher to a value between targetRangeLower and targetRangeHigher
@@ -108,36 +110,6 @@ class Options extends Phaser.Scene{
         let targetSpan = targetRangeHigher - targetRangeLower;
         return (((value - startRangeLower) / startSpan) * targetSpan) + targetRangeLower;
     }
-
-    // addSoundToggle()
-    // {
-    //     let soundScale = 0.5;
-
-    //     let sound_playing = this.add.image(0,0,"sound_playing");
-    //     sound_playing.setScale(soundScale);
-    //     sound_playing.setOrigin(0,1);
-    //     sound_playing.setPosition(0, this.game.renderer.height);
-    //     sound_playing.setInteractive();
-        
-    //     this.sound_mute = this.add.image(0,0,"sound_mute");
-    //     this.sound_mute.setVisible(false);
-    //     this.sound_mute.setScale(soundScale);
-    //     this.sound_mute.setOrigin(0,1);
-    //     this.sound_mute.setPosition(0, this.game.renderer.height);
-    //     this.sound_mute.setInteractive();
-
-    //     sound_playing.on("pointerup", () => {
-    //         this.sound.mute = true;
-    //         sound_playing.setVisible(false);
-    //         this.sound_mute.setVisible(true);
-    //     });
-        
-    //     this.sound_mute.on("pointerup", () => {
-    //         this.sound.mute = false;
-    //         sound_playing.setVisible(true);
-    //         this.sound_mute.setVisible(false);
-    //     });
-    // }
 
     update()
     {

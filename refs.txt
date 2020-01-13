@@ -10,3 +10,13 @@ https://zeno07.itch.io/retro-pixel-style-basic-mobile-game-ui/download/eyJleHBpc
 
 packer
 https://www.codeandweb.com/free-sprite-sheet-packer
+
+background
+https://opengameart.org/content/black-and-green-2000x2000
+
+words
+https://github.com/dwyl/english-words
+
+
+icons
+https://shikashiassets.itch.io/shikashis-fantasy-icons-pack

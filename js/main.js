@@ -10,7 +10,7 @@ var config = {
             debug: false
         }
     },
-    scene: [Load, Menu, Options, Game, Game_Over],
+    scene: [Load, Menu, Options, HighScores, Game, Pause, Game_Over],
     render: {
         pixelArt: true
     }

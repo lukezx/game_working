@@ -23,8 +23,6 @@ class Game extends Phaser.Scene{
         this.makeHealthBar();
         this.spawnInitialEnemies();        
         this.addKeyboardListeners();
-
-        this.addSpacebarItem("violin");
     }
 
     addSpacebarItemSlot()
@@ -41,7 +39,7 @@ class Game extends Phaser.Scene{
     //Create all the variables used to manage the game and set them to their initial values 
     initialiseVariables()
     {
-        this.itemPool = settings.itemPool;
+        this.itemPool = JSON.parse(JSON.stringify(settings.itemPool));
         this.playerSpeed = settings.basePlayerSpeed;
         this.score = 0; //Keeps track of the score
         this.iFrames = false; //Whether the player has IFrames or not
@@ -183,7 +181,7 @@ class Game extends Phaser.Scene{
         }
         this.timeLastKeyTyped = this.game.getTime();
         //list of keys that need to be ignored
-        let keysToIgnore = ["Shift", "Control", "Alt", "AltGraph", "Unidentified", "OS"];
+        let keysToIgnore = ["Shift", "Control", "Alt", "AltGraph", "Unidentified", "OS", "CapsLock"];
         if (event.keyCode > 36 && event.keyCode < 41) //ignore arrow keys
             return;
         if (keysToIgnore.findIndex((key, i) => key == event.key) != -1) 
@@ -212,6 +210,7 @@ class Game extends Phaser.Scene{
         else if (key != "Backspace")
         {
             this.currentWord += key;
+            this.currentWord = this.currentWord.toLowerCase()
         }
         this.display_typing.text = this.currentWord;
         this.checkWordHasBeenTyped();
@@ -237,7 +236,8 @@ class Game extends Phaser.Scene{
         this.sound.play("goblin_damage");
 
         //charge spacebar item
-        this.chargeSpacebarItem();
+        if (this.spacebarItem.item != "")
+            this.chargeSpacebarItem();
 
         //remove enemy
         let enemyArr = this.goblins.getChildren();
@@ -399,6 +399,8 @@ class Game extends Phaser.Scene{
     {
         this.spacebarItemCharge.clear();
         this.spacebarItem.charge += this.spacebarItem.chargeRate;
+        if (this.spacebarItem.charge > this.spacebarItem.chargeHeight)
+            this.spacebarItem.charge = this.spacebarItem.chargeHeight;
         this.spacebarItemCharge.fillRect(this.spacebarItemSprite.x + this.spacebarItemSprite.width + 5, this.spacebarItem_slot.y + this.spacebarItem.chargeHeight - this.spacebarItem.charge, 5, this.spacebarItem.charge);
     }
 

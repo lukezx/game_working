@@ -11,39 +11,55 @@ class Game extends Phaser.Scene{
 
     create()
     {
-        this.playSettings = new GameInstanceVars();
-        playSettings.soundToggle.addSoundToggle();
+        this.soundToggle = new SoundToggle(this);
+        this.soundToggle.addSoundToggle();
         this.initialiseVariables();
-        
-        this.waveTxt = this.add.text(this.game.renderer.width / 2, 10, `Wave ${this.wave}`, {font: "40px Impact"}).setOrigin(0.5, 0);
-
-        this.scoreTxt = this.add.text(this.game.renderer.width - 10, 10, `Score: ${this.score}`).setOrigin(1,0); //Game object to display current score
-        this.makeHighScoresList();
-
-        
-
         this.floor = this.add.image(0, this.game.renderer.height, "floor").setOrigin(0, 1);
+        this.addSpacebarItemSlot()
+        this.addUIText();
+        this.loadDictionary();
+        this.createAnims();
+        this.makePlayer();
+        this.makeHealthBar();
+        this.spawnInitialEnemies();        
+        this.addKeyboardListeners();
 
-        this.display_typing = this.add.text(this.game.renderer.width / 2, this.game.renderer.height - this.floor.height - 10, "", {font: "40px Impact"}).setOrigin(0.5, 1);
+        this.addSpacebarItem("violin");
+    }
 
-        let cache = this.cache.text;
-        let words = cache.get('dict');
-        this.word_arr = words.split('\n');
+    addSpacebarItemSlot()
+    {
+        this.spacebarItem_slot = this.add.image(10, 50, "spacebarItem_box").setOrigin(0,0);
+        this.add.text(this.spacebarItem_slot.width + 20, this.spacebarItem_slot.height + 50, "spacebar").setOrigin(0,1);
+        this.spacebarItemCharge = this.add.graphics({
+            fillStyle: {
+                color: "0xffffff"
+            }
+        })
+    }
 
+    //Create all the variables used to manage the game and set them to their initial values 
+    initialiseVariables()
+    {
+        this.itemPool = settings.itemPool;
+        this.playerSpeed = settings.basePlayerSpeed;
+        this.score = 0; //Keeps track of the score
+        this.iFrames = false; //Whether the player has IFrames or not
+        this.timeDamageTaken = this.game.getTime(); //The game time when damage was last taken - used to turn off iFrames 
+        this.lives = settings.maxLives; //The starting amount of lives
+        this.shields = 0;
+        this.wave = 1;
+        this.enemySpeed = settings.enemySpeed;
+        this.droppedHearts = 0; //keeps track of the amount of hearts in the world
         this.used_words = []; //array to store the words currently in use 
         this.currentWord = ''; //the current string that has been typed 
+        this.spacebarItem = new SpacebarItem; //string containing the current spacebar item
+        this.enemiesFrozen = false;
+    }
 
-        //Make Player
-        this.player = this.physics.add.sprite(this.game.renderer.width / 2, this.game.renderer.height - this.floor.height + 10, "slime_run");
-        this.player.setScale(2);
-        this.player.setCollideWorldBounds();
-
-        //anims
-        this.createAnims();
-
-        this.player.play("player_anim");
-        this.physics.world.enableBody(this.player);
-
+    //Called on scene creation to spawn the first wave of enemies
+    spawnInitialEnemies()
+    {
         this.goblins = this.physics.add.group();
         for (let i = 0; i < 5; i++)
         {
@@ -53,31 +69,45 @@ class Game extends Phaser.Scene{
         // {
         //     this.enemies.add(this.makeBat());
         // }
+    }
 
-        this.makeHealthBar();
-
+    //Add listeners to enable typing input
+    addKeyboardListeners()
+    {
         this.cursorKeys = this.input.keyboard.createCursorKeys();
         this.keyboard = this.input.keyboard.addKeys("A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,Backspace");
-
         this.input.keyboard.on("keydown", event => this.keyTyped(event));
-        
     }
 
-    initialiseVariables()
+    //load txt file of words into an array
+    loadDictionary()
     {
-        this.itemPool = settings.itemPool;
-        this.playerSpeed = settings.basePlayerSpeed;
-        let soundToggle = new SoundToggle(this);
-        this.score = 0; //Keeps track of the score
-        this.iFrames = false; //Whether the player has IFrames or not
-        this.timeDamageTaken = this.game.getTime(); //The game time when damage was last taken - used to turn off iFrames 
-        this.lives = settings.maxLives; //The starting amount of lives
-        this.shields = 0;
-        this.wave = 1;
-        this.enemySpeed = settings.enemySpeed;
-        this.droppedHearts = 0; //keeps track of the amount of hearts in the world
+        let cache = this.cache.text;
+        let words = cache.get('dict');
+        this.word_arr = words.split('\n');
     }
 
+    //create the player sprite give it world collisions and play its animation
+    makePlayer()
+    {
+        this.player = this.physics.add.sprite(this.game.renderer.width / 2, this.game.renderer.height - this.floor.height + 10, "slime_run");
+        this.player.setScale(2);
+        this.player.setCollideWorldBounds();
+        this.player.play("player_anim");
+        this.physics.world.enableBody(this.player);
+    }
+
+    //Add user interface text
+    addUIText()
+    {
+        this.waveTxt = this.add.text(this.game.renderer.width / 2, 10, `Wave ${this.wave}`, {font: "40px Impact"}).setOrigin(0.5, 0);
+
+        this.scoreTxt = this.add.text(this.game.renderer.width - 10, 10, `Score: ${this.score}`).setOrigin(1,0); //Game object to display current score
+        this.makeHighScoresList();
+        this.display_typing = this.add.text(this.game.renderer.width / 2, this.game.renderer.height - this.floor.height - 10, "", {font: "40px Impact"}).setOrigin(0.5, 1);
+    }
+
+    //Create all the animation frames and sequences 
     createAnims()
     {
         this.anims.create({
@@ -114,6 +144,7 @@ class Game extends Phaser.Scene{
         });
     }
 
+    //Create the highscore list shown in the top right during game play 
     makeHighScoresList()
     {
         let scoreList = settings.highScores;
@@ -129,6 +160,7 @@ class Game extends Phaser.Scene{
         }
     }
 
+    //Create the healthbar ui element 
     makeHealthBar()
     {
        this.healthBarGUI = this.add.image(10, 10, "health_bar").setOrigin(0).setScale(2).setDepth(100);
@@ -141,6 +173,7 @@ class Game extends Phaser.Scene{
        this.shieldCounterTxt = this.add.text(this.shieldCounter.x + this.shieldCounter.width + 5, this.shieldCounter.y, "x0");
     }
 
+    //called after a keypress to handle typing input
     keyTyped(event)
     {
         if (this.timeLastKeyTyped)
@@ -172,6 +205,10 @@ class Game extends Phaser.Scene{
             this.scene.pause();
             this.scene.run("Pause")
         }
+        else if (event.keyCode == 32) //spacebar
+        {
+            this.useSpacebarItem();
+        }
         else if (key != "Backspace")
         {
             this.currentWord += key;
@@ -180,6 +217,7 @@ class Game extends Phaser.Scene{
         this.checkWordHasBeenTyped();
     }
 
+    //Check if one of the words associated with an enemy has been typed 
     checkWordHasBeenTyped()
     {
         if (this.used_words.indexOf(this.currentWord) != -1) //word has been typed
@@ -188,9 +226,9 @@ class Game extends Phaser.Scene{
         }
     }
 
+    //Handle the destruction of an enemy 
     enemyKilled(enemyWord)
     {
-        
         //Clear the typed word
         this.currentWord = ""; 
         this.display_typing.text = this.currentWord;
@@ -198,38 +236,44 @@ class Game extends Phaser.Scene{
         //Play a sound
         this.sound.play("goblin_damage");
 
+        //charge spacebar item
+        this.chargeSpacebarItem();
+
         //remove enemy
         let enemyArr = this.goblins.getChildren();
-        for (let i = 0; i < enemyArr.length; i++) {
+        for (let i = 0; i < enemyArr.length; i++) 
+        {
             if (enemyArr[i].list[0].word == enemyWord)
             {
                 enemyArr[i].destroy();
             }
         }
-
         //increase the score and update the display
         this.addToScore(100);
         this.checkWaveEnd();
     }
 
+    //Called everytime an enemy is killed to check if the wave is over 
     checkWaveEnd()
     {
         if (this.goblins.getChildren().length == 0) //if no enemies left then wave is over
            this.waveEnded();
     }
 
+    //called if the wave is over 
     waveEnded()
     {
         this.addToScore(1000 * this.wave);
         this.wave ++;
         
-        if (this.wave % 2 == 0)
+        if (this.wave % 3 == 0)
             this.spawnTreasure();
         else {
             this.startWaveCountdown();
         }
     }
 
+    //Called every three waves to spawn a treasure chest
     spawnTreasure()
     {
         let chest = this.physics.add.sprite(this.game.renderer.width / 2, this.game.renderer.height - this.floor.height / 2, "chest").setScale(3);
@@ -280,6 +324,7 @@ class Game extends Phaser.Scene{
         return item;
     }
 
+    //start the countdown to the next wave 
     startWaveCountdown()
     {
         this.waveCountdownTxt = this.add.text(this.game.renderer.width / 2, 90, "5", {font: "70px Impact"}).setOrigin(0.5);
@@ -325,7 +370,52 @@ class Game extends Phaser.Scene{
 
     addSpacebarItem(item)
     {
+        this.spacebarItem.item = item;
+        let index = settings.spacebarItems.findIndex((val, i) => val.item == item);
+        this.spacebarItem.chargeRate = settings.spacebarItems[index].chargeRate;
+        this.spacebarItem.charge = 70;
+        this.spacebarItemSprite = this.add.image(this.spacebarItem_slot.x + this.spacebarItem_slot.width / 2, this.spacebarItem_slot.y + this.spacebarItem_slot.height / 2, item);
+        this.spacebarItemSprite.setScale(2);
+        this.spacebarItemCharge.fillRect(this.spacebarItemSprite.x + this.spacebarItemSprite.width + 5, this.spacebarItem_slot.y, 5, 70);
+    }
 
+    useSpacebarItem()
+    {
+        if (this.spacebarItem.charge >= this.spacebarItem.chargeHeight)
+        {
+            this.spacebarItemCharge.clear();
+            switch (this.spacebarItem.item)
+            {
+                case "":
+                    break;
+                case "violin":
+                    this.freezeEnemies();
+                    this.spacebarItem.charge = 0;
+            }
+        }
+    }
+
+    chargeSpacebarItem()
+    {
+        this.spacebarItemCharge.clear();
+        this.spacebarItem.charge += this.spacebarItem.chargeRate;
+        this.spacebarItemCharge.fillRect(this.spacebarItemSprite.x + this.spacebarItemSprite.width + 5, this.spacebarItem_slot.y + this.spacebarItem.chargeHeight - this.spacebarItem.charge, 5, this.spacebarItem.charge);
+    }
+
+    freezeEnemies()
+    {
+        this.enemiesFrozen = true;
+        this.freezeTimer = this.time.addEvent({
+            delay: 5000,
+            callback: () => {
+                this.enemiesFrozen = false;
+                this.freezeTimer.destroy();
+                for (let i = 0; i < this.goblins.getChildren().length; i++)
+                {
+                    this.goblins.getChildren()[i].list[0].anims.play();
+                }
+            }
+        })
     }
 
     addToScore(amount)
@@ -480,12 +570,20 @@ class Game extends Phaser.Scene{
     moveEnemies(enemyGroup)
     {
         for (let i = 0; i < enemyGroup.getChildren().length; i++) {
-            this.physics.moveToObject(enemyGroup.getChildren()[i], this.player, enemyGroup.getChildren()[i].list[0].speed);
-            if (enemyGroup.getChildren()[i].body.x > this.player.x){
-                enemyGroup.getChildren()[i].list[0].setFlipX(true);
+            if (this.enemiesFrozen)
+            {
+                enemyGroup.getChildren()[i].body.setVelocity(0);
+                enemyGroup.getChildren()[i].list[0].anims.pause();
             }
-            else {
-                enemyGroup.getChildren()[i].list[0].setFlipX(false);
+            else
+            {
+                this.physics.moveToObject(enemyGroup.getChildren()[i], this.player, enemyGroup.getChildren()[i].list[0].speed);
+                if (enemyGroup.getChildren()[i].body.x > this.player.x){
+                    enemyGroup.getChildren()[i].list[0].setFlipX(true);
+                }
+                else {
+                    enemyGroup.getChildren()[i].list[0].setFlipX(false);
+                }
             }
         }
     }

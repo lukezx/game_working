@@ -101,6 +101,10 @@ images = [
     {
         key: "violin",
         path: "/assets/Shikashi's Fantasy Icons Pack/violin.png"
+    },
+    {
+        key: "spacebarItem_box",
+        path: "/assets/UI/spacebarItem_box.png"
     }
 ];
 

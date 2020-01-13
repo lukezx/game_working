@@ -14,6 +14,7 @@ class Global_Settings
         this.maxHeartsOnScreen = 2;
         this.highScores = [];
         this.itemPool = ["shield", "speed_boots", "speed_pot", "violin"];
+        this.spacebarItems = [{item: "violin", chargeRate: 5}]
         this.basePlayerSpeed = 65;
     }
 }

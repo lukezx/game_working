@@ -56,15 +56,15 @@ images = [
     },
     {
         key: "sound_playing",
-        path: "/assets/ui/sound_playing.png"
+        path: "/assets/UI/sound_playing.png"
     },
     {
         key: "sound_mute",
-        path: "/assets/ui/sound_mute.png"
+        path: "/assets/UI/sound_mute.png"
     },
     {
         key: "volume_slider",
-        path: "/assets/ui/volume_outline.png"
+        path: "/assets/UI/volume_outline.png"
     },
     {
         key: "floor", 
@@ -72,15 +72,15 @@ images = [
     },
     {
         key: "menu_background",
-        path: "assets/backgrounds/menu_background.png"
+        path: "/assets/backgrounds/menu_background.png"
     },
     {
         key: "health_bar",
-        path: "assets/v1.1 dungeon crawler 16x16 pixel pack/ui (new)/health_ui.png"
+        path: "/assets/v1.1 dungeon crawler 16x16 pixel pack/ui (new)/health_ui.png"
     },
     {
         key: "heart_drop",
-        path: "assets/v1.1 dungeon crawler 16x16 pixel pack/ui (new)/heart.png"
+        path: "/assets/v1.1 dungeon crawler 16x16 pixel pack/ui (new)/heart.png"
     },
     {
         key: "chest_open",
